@@ -1,7 +1,7 @@
 version: '3'
 x-airflow-common:
   &airflow-common
-  image: apache/airflow:2.0.1
+  image: apache/airflow:2.7.2
   environment:
     - AIRFLOW__CORE__EXECUTOR=LocalExecutor
     - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://postgres:postgres@postgres:5432/airflow
@@ -17,14 +17,14 @@ x-airflow-common:
 
 services:
   postgres:
-    image: postgres:12
+    image: postgres:13
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=airflow
-      - POSTGRES_PORT=5432
+      - POSTGRES_PORT=5433  # Change the port to 5433 to avoid conflicts
     ports:
-      - "5432:5432"
+      - "5433:5432"  # Map the container port to the local port
 
   airflow-init:
     << : *airflow-common
@@ -32,7 +32,7 @@ services:
     entrypoint: /bin/bash
     command:
       - -c
-      - airflow users list || ( airflow db init &&
+      - (airflow db init &&
         airflow users create
         --role Admin
         --username airflow
@@ -46,7 +46,7 @@ services:
     << : *airflow-common
     command: airflow webserver
     ports:
-      - 8080:8080
+      - "8080:8080"
     container_name: airflow_webserver
     restart: always
 

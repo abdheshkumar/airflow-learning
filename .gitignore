@@ -1,4 +1,4 @@
 .DS_Store
 airflow-data
 dags/__pycache__
-
+.idea
